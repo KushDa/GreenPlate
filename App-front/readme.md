@@ -1,4 +1,3 @@
-
 # 🌱 GreenPlate
 
 **Sustainable Food Waste Reduction Platform**
@@ -115,4 +114,3 @@ Having issues? Check:
 ---
 
 **Built with 💚 for a sustainable future**
-
