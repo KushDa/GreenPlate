@@ -2,36 +2,47 @@ import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
 import { auth } from '../firebaseConfig';
 
-export const API_BASE_URL =
-  Capacitor.isNativePlatform()
-    ? 'http://10.190.179.254:8000'
-    : import.meta.env.VITE_API_BASE_URL;
+// ── Config ────────────────────────────────────────────────────────────────────
+export const API_BASE_URL = Capacitor.isNativePlatform()
+  ? 'http://10.190.179.254:8000'
+  : import.meta.env.VITE_API_BASE_URL;
 
+// ── Shared Types (exported so consumers don't need to redefine) ───────────────
+export interface CartItem {
+  item_id: string;
+  quantity: number;
+}
 
+export interface VerifyOrderPayload {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+  internal_order_id: string;
+}
+
+// ── Axios Instance ────────────────────────────────────────────────────────────
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
 
 api.interceptors.request.use(async (config) => {
   const user = auth.currentUser;
-
   if (user) {
     const token = await user.getIdToken(false);
     config.headers.Authorization = `Bearer ${token}`;
   } else {
     console.warn('⚠️ auth.currentUser is NULL – request sent without token');
   }
-
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  async (error: unknown) => {
+    if (!axios.isAxiosError(error)) return Promise.reject(error);
+
     console.error('❌ API ERROR:', {
       url: error.config?.url,
       status: error.response?.status,
@@ -42,10 +53,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && auth.currentUser) {
       try {
         const newToken = await auth.currentUser.getIdToken(true);
-        error.config.headers.Authorization = `Bearer ${newToken}`;
-        return api(error.config);
-      } catch (e) {
-        console.error('❌ Token refresh failed', e);
+        if (error.config) {
+          error.config.headers.Authorization = `Bearer ${newToken}`;
+          return api(error.config);
+        }
+      } catch (refreshErr) {
+        console.error('❌ Token refresh failed', refreshErr);
       }
     }
 
@@ -55,7 +68,7 @@ api.interceptors.response.use(
 
 export default api;
 
-// ---------------- API HELPERS ----------------
+// ── API Helpers ───────────────────────────────────────────────────────────────
 export const verifyStudent = async () =>
   (await api.post('/auth/verify-student')).data;
 
@@ -71,10 +84,10 @@ export const getStaffProfile = async () =>
 export const getUserMenu = async () =>
   (await api.get('/user/menu')).data;
 
-export const createPaymentOrder = async (stallId: string, items: any[]) =>
+export const createPaymentOrder = async (stallId: string, items: CartItem[]) =>
   (await api.post('/user/order/create', { stall_id: stallId, items })).data;
 
-export const verifyOrder = async (data: any) =>
+export const verifyOrder = async (data: VerifyOrderPayload) =>
   (await api.post('/user/order/verify', data)).data;
 
 export const getStaffMenu = async () =>
@@ -95,17 +108,17 @@ export const verifyPickup = async (orderId: string, pickupCode: string) =>
     pickup_code: pickupCode,
   })).data;
 
-export const cancelOrder = async (orderId: string) => 
+export const cancelOrder = async (orderId: string) =>
   (await api.post(`/user/order/${orderId}/cancel`)).data;
 
-export const getDiscountedFeed = async () => 
+export const getDiscountedFeed = async () =>
   (await api.get('/user/feed/discounted')).data;
 
 export const buyResaleItem = async (resaleId: string) =>
-  (await api.post(`/user/reasle/${resaleId}/buy`)).data
+  (await api.post(`/user/reasle/${resaleId}/buy`)).data;
 
-export const getStallResaleItems = async () =>  
+export const getStallResaleItems = async () =>
   (await api.get('/staff/resale/items')).data;
 
-export const updateResalePrice  = async (resaleId:string, newPrice: number) =>
-  (await api.patch(`/staff/resale/${resaleId}/price`,{new_price:newPrice })).data
+export const updateResalePrice = async (resaleId: string, newPrice: number) =>
+  (await api.patch(`/staff/resale/${resaleId}/price`, { new_price: newPrice })).data;
