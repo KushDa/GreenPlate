@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Minus, Loader2, ShoppingBag, X,  Timer, Zap, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { initiatePayment, initiateResalePayment } from '@/services/paymentService';
 import { auth } from '../src/firebaseConfig';
 import { getUserMenu, verifyOrder, getDiscountedFeed, buyResaleItem  } from '../src/services/api';
+import { initiatePayment,initiateResalePayment } from '../src/services/paymentService';
 
 const MENU_IMAGE_BASE_URL = "https://raw.githubusercontent.com/AkibDa/backend/main/images_for_demo";
 

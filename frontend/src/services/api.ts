@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { auth } from '@/firebaseConfig';
 import { Capacitor } from '@capacitor/core';
+import { auth } from '../firebaseConfig';
 
 export const API_BASE_URL =
   Capacitor.isNativePlatform()
