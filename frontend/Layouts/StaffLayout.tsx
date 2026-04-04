@@ -6,7 +6,7 @@ import IncomingReservations from '../Pages/IncomingReservations';
 import Profile from '../Pages/Profile';
 import CreatePost from '../Pages/CreatePost';
 import { motion, AnimatePresence } from 'framer-motion';
-import GreenPlateLogo from 
+import GreenPlateLogo from '../assets/GreenPlate.png';
 
 const StaffLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'queue' | 'pickup' | 'profile'>('dashboard');

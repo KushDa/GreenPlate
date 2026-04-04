@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { UserRole } from './types';
-import Splash from './Pages/Splash';
-import Auth from './Pages/Auth';
-import UserLayout from './Layouts/UserLayout';
-import StaffLayout from './Layouts/StaffLayout';
+import { AppProvider, useApp } from '../context/AppContext';
+import { UserRole } from '../types';
+import Splash from '../Pages/Splash';
+import Auth from '../Pages/Auth';
+import UserLayout from '../Layouts/UserLayout';
+import StaffLayout from '../Layouts/StaffLayout';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const SmoothBackground: React.FC = () => (
