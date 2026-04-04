@@ -4,7 +4,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from app.core.security import rate_limit_key
-from app.api import user , staff, manager, webhook, auth
+from app.api import user, staff, manager, webhook, auth
 
 limiter = Limiter(key_func=rate_limit_key)
 
@@ -14,17 +14,19 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
 )
+
 
 @app.get("/health", tags=["health"])
 @limiter.limit("10/minute")
 def health_check(request: Request):
-    return {"status": "ok", "service": "greenplate-backend-v2"}
+  return {"status": "ok", "service": "greenplate-backend"}
+
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(user.router, prefix="/user", tags=["user"])
