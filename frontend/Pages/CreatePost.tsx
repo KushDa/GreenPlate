@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { X, Camera as CameraIcon, Loader2, Trash2, Save, Plus, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import api from '../src/services/api';
+import { Camera as CapCamera, CameraResultType, CameraSource }  from '@capacitor/camera';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface ScannedItem {
