@@ -4,7 +4,7 @@ import { auth } from '../firebaseConfig';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 export const API_BASE_URL = Capacitor.isNativePlatform()
-  ? 'http://10.190.179.254:8000'
+  ? 'http://192.168.54.51:8080'
   : import.meta.env.VITE_API_BASE_URL;
 
 // ── Shared Types (exported so consumers don't need to redefine) ───────────────
