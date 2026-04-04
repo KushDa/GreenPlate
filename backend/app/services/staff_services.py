@@ -13,8 +13,9 @@ from app.core.firebase import db
 from app.core.config import settings
 from app.schemas.staff import (
     MenuSchema, UpdateMenuItemSchema, UpdateOrderStatusSchema,
-    VerifyPickupSchema, UpdateStaffProfileSchema
+    VerifyPickupSchema, UpdateStaffProfileSchema, CreateDonationSchema
 )
+from app.utils.mailer import send_shelter_donation_email
 
 class StaffService:
     def __init__(self):
@@ -666,6 +667,172 @@ class StaffService:
         })
 
         return JSONResponse(status_code=200, content={"message": "Price updated successfully"})
+
+      except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})
+
+    async def create_food_donation_request(
+          self,
+          donation_data: CreateDonationSchema,
+          id_token: str
+      ):
+      try:
+        staff_data, _ = await self.get_staff_details(id_token)
+        if not staff_data:
+          return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"message": "Unauthorized"}
+          )
+
+        if staff_data.get("role") not in ["staff", "manager"]:
+          return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": "Only stall staff can create donation requests."}
+          )
+
+        stall_id = staff_data.get("stall_id")
+        college_id = staff_data.get("college_id")
+
+        stall_doc = (
+          db.collection("colleges")
+          .document(college_id)
+          .collection("stalls")
+          .document(stall_id)
+          .get()
+        )
+
+        stall_name = "Unknown Stall"
+        if stall_doc.exists:
+          stall_name = stall_doc.to_dict().get("name", "Unknown Stall")
+
+        shelters_query = (
+          db.collection("shelters")
+          .where("college_id", "==", college_id)
+          .where("is_active", "==", True)
+          .limit(1)
+          .stream()
+        )
+
+        nearest_shelter = None
+        for shelter in shelters_query:
+          nearest_shelter = shelter
+          break
+
+        if not nearest_shelter:
+          return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "No active shelter found nearby."}
+          )
+
+        shelter_data = nearest_shelter.to_dict()
+
+        donation_ref = db.collection("food_donations").document()
+
+        donation_payload = {
+          "stall_id": stall_id,
+          "stall_name": stall_name,
+          "college_id": college_id,
+          "items": [item.model_dump() for item in donation_data.items],
+          "notes": donation_data.notes,
+          "pickup_deadline": donation_data.pickup_deadline,
+          "status": "PENDING",
+          "assigned_shelter_id": nearest_shelter.id,
+          "assigned_shelter_name": shelter_data.get("name"),
+          "created_by": staff_data.get("email"),
+          "created_at": firestore.SERVER_TIMESTAMP,
+        }
+
+        donation_ref.set(donation_payload)
+
+        send_shelter_donation_email(
+          to_email=shelter_data.get("email"),
+          shelter_name=shelter_data.get("name", "Shelter"),
+          donation_data=donation_payload
+        )
+
+        return JSONResponse(
+          status_code=status.HTTP_201_CREATED,
+          content={
+            "message": "Donation request created and shelter notified.",
+            "donation_id": donation_ref.id,
+            "assigned_shelter": shelter_data.get("name")
+          }
+        )
+
+      except Exception as e:
+        return JSONResponse(
+          status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+          content={"message": str(e)}
+        )
+
+    async def convert_resale_to_donation(self, resale_id: str, id_token: str):
+      try:
+        staff_data, _ = await self.get_staff_details(id_token)
+        if not staff_data:
+          return JSONResponse(status_code=401, content={"message": "Unauthorized"})
+
+        stall_id = staff_data.get("stall_id")
+        college_id = staff_data.get("college_id")
+
+        resale_ref = db.collection("resale_items").document(resale_id)
+        resale_doc = resale_ref.get()
+
+        if not resale_doc.exists:
+          return JSONResponse(status_code=404, content={"message": "Resale item not found"})
+
+        resale_data = resale_doc.to_dict()
+
+        if resale_data.get("stall_id") != stall_id:
+          return JSONResponse(status_code=403, content={"message": "Unauthorized"})
+
+        if resale_data.get("status") != "AVAILABLE":
+          return JSONResponse(
+            status_code=400,
+            content={"message": "Only available resale items can be donated."}
+          )
+
+        shelters = (
+          db.collection("shelters")
+          .where("college_id", "==", college_id)
+          .where("is_active", "==", True)
+          .limit(1)
+          .stream()
+        )
+
+        shelter_doc = next(shelters, None)
+        if not shelter_doc:
+          return JSONResponse(status_code=404, content={"message": "No shelter found"})
+
+        shelter_data = shelter_doc.to_dict()
+
+        donation_ref = db.collection("food_donations").document()
+        donation_payload = {
+          "stall_id": stall_id,
+          "stall_name": resale_data.get("stall_name"),
+          "college_id": college_id,
+          "items": resale_data.get("items", []),
+          "original_resale_id": resale_id,
+          "status": "PENDING",
+          "assigned_shelter_id": shelter_doc.id,
+          "created_by": staff_data.get("email"),
+          "created_at": firestore.SERVER_TIMESTAMP
+        }
+
+        batch = db.batch()
+        batch.set(donation_ref, donation_payload)
+        batch.update(resale_ref, {"status": "DONATED"})
+        batch.commit()
+
+        send_shelter_donation_email(
+          shelter_data.get("email"),
+          shelter_data.get("name", "Shelter"),
+          donation_payload
+        )
+
+        return JSONResponse(
+          status_code=200,
+          content={"message": "Resale item converted to donation successfully."}
+        )
 
       except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
