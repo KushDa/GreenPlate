@@ -3,7 +3,7 @@ import { Home, Receipt, User as UserIcon } from 'lucide-react';
 import MyOrders from '../Pages/MyOrder';
 import Profile from '../Pages/Profile';
 import { motion} from 'framer-motion'; 
-import GreenPlateLogo from '../assests/GreenPlate.png'; 
+// import GreenPlateLogo from '../assests/GreenPlate.png'; 
 
 // 1. Import Auth to get the current user// Optional: if you store user data here too
 import UserHome from '../Pages/Userhome';
@@ -22,11 +22,11 @@ const UserLayout: React.FC = () => {
     <div className="flex flex-col h-screen bg-white">
       <header className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white z-20">
         <div className="flex items-center gap-2"> 
-          <img 
-            src={GreenPlateLogo} 
-            alt="GreenPlate Logo" 
-            className="w-10 h-10 object-contain" 
-          />
+          <div 
+            className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm"
+          >
+            GP
+          </div>
 
           <span style={{ fontFamily: 'Geom' }} className="font-bold text-xl text-gray-900 mt-1"> 
             GreenPlate
