@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, ChevronRight, Sparkles, TrendingDown, Zap } from 'lucide-react';
 // Make sure this path matches your folder name (assests vs assets)
-// import logoPng from '../assests/GreenPlate.png'; 
+import logoPng from './assests/GreenPlate.png'; 
 
 const Splash: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   const [stage, setStage] = useState<'branding' | 'ecosystem'>('branding');

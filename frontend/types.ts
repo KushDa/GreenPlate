@@ -1,8 +1,4 @@
-
-export enum UserRole {
-  USER = 'USER',
-  STAFF = 'STAFF'
-}
+export type UserRole = 'USER' | 'STAFF';
 
 export interface NutritionalInfo {
   calories: number;
@@ -42,14 +38,14 @@ export interface FoodDeal {
 
 export interface OrderItem {
   item_id: string;
-  name:string;
+  name: string;
   price: number;
   quantity: number;
 }
 
 export interface Order {
   id: string;
-  items:OrderItem[];
+  items: OrderItem[];
   cafeteriaName: string;
   status: 'Reserved' | 'Claimed' | 'Ready' | 'Completed' | 'Cancelled';
   timestamp: number;
