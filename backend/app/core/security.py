@@ -1,3 +1,5 @@
+# app/core/security.py
+
 import hashlib
 from fastapi import Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
