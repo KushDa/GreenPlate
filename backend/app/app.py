@@ -15,7 +15,19 @@ app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=["*"],
+  allow_origins=[""
+  "http://localhost",
+        "capacitor://localhost",
+        "http://localhost:3000",
+        "http://localhost:3080",
+        "http://127.0.0.1:3000",
+        "http://localhost:5500",
+        "http://localhost:5173",
+        "http://127.0.0.1:5500",
+        "http://10.0.2.2:3000",
+        "http://10.0.2.2:5000",
+        "http://10.0.2.2:8000",
+  ],
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],

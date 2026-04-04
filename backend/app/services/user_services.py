@@ -359,8 +359,10 @@ class UserService:
         content={"message": str(e)}
       )
 
-  def normalize_order_status(status: str):
-    status = status.upper() if status else ""
+  # FIX 1: Added @staticmethod decorator (was missing 'self', causing crash in get_user_orders)
+  @staticmethod
+  def normalize_order_status(order_status: str):
+    order_status = order_status.upper() if order_status else ""
     return {
       "PENDING": "Payment Pending",
       "PAID": "Reserved",
@@ -368,19 +370,21 @@ class UserService:
       "READY": "Ready",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
-    }.get(status, "Unknown")
+    }.get(order_status, "Unknown")
 
+  # FIX 2: Added @staticmethod decorator (was missing 'self')
+  @staticmethod
   def calculate_refund(order: dict):
     total = order.get("total_amount", 0)
-    status = order.get("status")
+    order_status = order.get("status")
 
-    if status in ["CREATED"]:
+    if order_status in ["CREATED"]:
       return total, "FULL_REFUND"
 
-    if status == "PAID":
+    if order_status == "PAID":
       return total, "FULL_REFUND"
 
-    if status == "READY":
+    if order_status == "READY":
       percent = (
         order.get("refund_policy", {})
         .get("ready_refund_percent", 50)
@@ -432,22 +436,24 @@ class UserService:
       if order_data.get("user_id") != user_uid:
         return JSONResponse(status_code=403, content={"message": "You do not own this order"})
 
-      current_status = order_data.get("status")
+      # FIX 3: Renamed 'status' local var to 'current_order_status' to avoid
+      # shadowing the starlette 'status' import used for HTTP status codes above
+      current_order_status = order_data.get("status")
 
-      if current_status in ["CLAIMED", "COMPLETED", "CANCELLED"]:
+      if current_order_status in ["CLAIMED", "COMPLETED", "CANCELLED"]:
         return JSONResponse(
           status_code=400,
-          content={"message": f"Cannot cancel order with status: {current_status}"}
+          content={"message": f"Cannot cancel order with status: {current_order_status}"}
         )
 
       total_amount = order_data.get("total_amount", 0)
       refund_amount = 0
       refund_type = "NO_REFUND"
 
-      if current_status == "READY":
+      if current_order_status == "READY":
         refund_amount = int(total_amount * 0.70)
         refund_type = "PARTIAL_REFUND"
-      elif current_status in ["PAID", "RESERVED"]:
+      elif current_order_status in ["PAID", "RESERVED"]:
         refund_amount = total_amount
         refund_type = "FULL_REFUND"
 
@@ -478,7 +484,7 @@ class UserService:
 
       resale_created = False
 
-      if current_status == "READY":
+      if current_order_status == "READY":
         college_id = order_data.get("college_id")
         stall_id = order_data.get("stall_id")
 
