@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../src/firebaseConfig';
 import { verifyStudent, verifyStaff, activateStaff, getStaffProfile } from '../src/services/api';
-import { UserRole } from '../types';
+import type { UserRole } from '../types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type AuthProps = { verifyOnly?: boolean };
@@ -40,7 +40,8 @@ const getFirebaseErrorMessage = (err: FirebaseError): string => {
 const Auth: React.FC<AuthProps> = ({ verifyOnly = false }) => {
   const { setUserRole, setOnboarded, setVerified, setStaffProfile } = useApp();
 
-  const [role, setRole] = useState<UserRole>(UserRole.USER);
+  // FIX: Initialize with string literal 'USER'
+  const [role, setRole] = useState<UserRole>('USER');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -72,9 +73,10 @@ const Auth: React.FC<AuthProps> = ({ verifyOnly = false }) => {
       if (!user) throw new Error('Authentication failed. Please try again.');
 
       // Student flow
-      if (role === UserRole.USER) {
+      // FIX: Check against string literal 'USER'
+      if (role === 'USER') {
         await verifyStudent();
-        setUserRole(UserRole.USER);
+        setUserRole('USER');
         setVerified(true);
         setOnboarded(true);
         return;
@@ -91,7 +93,8 @@ const Auth: React.FC<AuthProps> = ({ verifyOnly = false }) => {
         stallName: profile.stall_name,
         email: profile.email,
       });
-      setUserRole(UserRole.STAFF);
+      // FIX: Set with string literal 'STAFF'
+      setUserRole('STAFF');
       setVerified(true);
       setOnboarded(true);
     } catch (err) {
@@ -130,7 +133,8 @@ const Auth: React.FC<AuthProps> = ({ verifyOnly = false }) => {
 
         {/* Role Switcher */}
         <div className="bg-gray-100/80 p-1 rounded-xl flex mb-8">
-          {([UserRole.USER, UserRole.STAFF] as const).map((r) => (
+          {/* FIX: Map over an array of string literals instead of enums */}
+          {(['USER', 'STAFF'] as UserRole[]).map((r) => (
             <button
               key={r}
               onClick={() => setRole(r)}
@@ -138,7 +142,7 @@ const Auth: React.FC<AuthProps> = ({ verifyOnly = false }) => {
                 role === r ? 'bg-white shadow-sm text-green-600' : 'text-gray-500'
               }`}
             >
-              {r === UserRole.USER ? 'Student' : 'Staff'}
+              {r === 'USER' ? 'Student' : 'Staff'}
             </button>
           ))}
         </div>

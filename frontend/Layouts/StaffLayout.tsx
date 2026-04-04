@@ -8,8 +8,21 @@ import CreatePost from '../Pages/CreatePost';
 import { motion, AnimatePresence } from 'framer-motion';
 import GreenPlateLogo from '../assets/GreenPlate.png';
 
+// 1. FIX: Define a strict type for your tabs
+type TabKey = 'dashboard' | 'queue' | 'pickup' | 'profile';
+
+// 2. OPTIMIZATION: Move static data outside the component.
+// This prevents React from recreating this array on every single render.
+const navItems: { id: TabKey; label: string; icon: React.ReactNode }[] = [
+  { id: 'dashboard', label: 'Overview', icon: <LayoutDashboard size={22} strokeWidth={2} /> },
+  { id: 'queue', label: 'Kitchen', icon: <ChefHat size={22} strokeWidth={2} /> },
+  { id: 'pickup', label: 'Pickup', icon: <PackageCheck size={22} strokeWidth={2} /> },
+  { id: 'profile', label: 'Profile', icon: <User size={22} strokeWidth={2} /> },
+];
+
 const StaffLayout: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'queue' | 'pickup' | 'profile'>('dashboard');
+  // 3. Apply the type to your state
+  const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [showCreatePost, setShowCreatePost] = useState(false);
 
   const renderContent = () => {
@@ -21,13 +34,6 @@ const StaffLayout: React.FC = () => {
       default: return <StaffDashboard />;
     }
   };
-
-  const navItems = [
-    { id: 'dashboard', label: 'Overview', icon: <LayoutDashboard size={22} strokeWidth={2} /> },
-    { id: 'queue', label: 'Kitchen', icon: <ChefHat size={22} strokeWidth={2} /> },
-    { id: 'pickup', label: 'Pickup', icon: <PackageCheck size={22} strokeWidth={2} /> },
-    { id: 'profile', label: 'Profile', icon: <User size={22} strokeWidth={2} /> },
-  ];
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-gray-50/50">
@@ -54,7 +60,7 @@ const StaffLayout: React.FC = () => {
         </div>
       </header>
 
-      {/* 2. Content Area */}
+      {/* Content Area */}
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
         <AnimatePresence mode="wait">
           <motion.div
@@ -76,7 +82,7 @@ const StaffLayout: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* 3. Floating Action Button (Raised above navbar) */}
+      {/* Floating Action Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -87,14 +93,16 @@ const StaffLayout: React.FC = () => {
         <Plus size={26} strokeWidth={2.5} />
       </motion.button>
 
-      {/* 4. Minimalist Bottom "Box" Navbar */}
+      {/* Minimalist Bottom "Box" Navbar */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-2 pb-5 z-50 flex justify-between items-center">
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
+              // 4. FIX: Because item.id is now strictly typed as TabKey, 
+              // we can safely remove 'as any' without errors!
+              onClick={() => setActiveTab(item.id)}
               className="relative flex flex-col items-center justify-center w-16 h-14 group"
             >
               {/* Active Background Pill Animation */}
@@ -111,7 +119,7 @@ const StaffLayout: React.FC = () => {
                 {item.icon}
               </span>
 
-              {/* Label (Optional: Remove this span if you want ONLY icons) */}
+              {/* Label */}
               <span 
                 className={`relative z-10 text-[10px] font-bold mt-1 transition-all duration-300 ${
                   isActive ? 'text-emerald-700 translate-y-0 opacity-100' : 'text-gray-400 translate-y-1 opacity-0'
