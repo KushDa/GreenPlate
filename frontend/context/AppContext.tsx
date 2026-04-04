@@ -8,9 +8,9 @@ import React, {
 } from 'react';
 
 import { UserRole, AppState, FoodDeal, Order, Cafeteria } from '../types';
-import { INITIAL_DEALS, INITIAL_CAFETERIAS } from '../constants';// ✅ USE AXIOS ONLY
 import { auth } from '../src/firebaseConfig';
 import api from '../src/services/api';
+import { INITIAL_DEALS , INITIAL_CAFETERIAS} from '../constants';
 
 type StaffProfile = {
   role: 'manager' | 'staff';
