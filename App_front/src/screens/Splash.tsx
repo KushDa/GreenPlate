@@ -7,7 +7,7 @@ export const SplashScreen = ({ onComplete }: { onComplete: () => void, key?: str
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev: number) => {
         if (prev >= 100) {
           clearInterval(interval);
           setTimeout(onComplete, 500);
