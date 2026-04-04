@@ -1,16 +1,18 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, {
   createContext,
   useContext,
   useState,
-  ReactNode,
+  type ReactNode,
   useEffect,
   useCallback,
 } from 'react';
 
-import { UserRole, AppState, FoodDeal, Order, Cafeteria } from '../types';
+// FIX 1: Added 'type' keyword for all these type/interface imports
+import type { UserRole, AppState, FoodDeal, Order, Cafeteria } from '../types';
 import { auth } from '../src/firebaseConfig';
 import api from '../src/services/api';
-import { INITIAL_DEALS , INITIAL_CAFETERIAS} from '../constants';
+import { INITIAL_DEALS, INITIAL_CAFETERIAS } from '../constants';
 
 type StaffProfile = {
   role: 'manager' | 'staff';
@@ -47,7 +49,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [orders, setOrders] = useState<Order[]>([]);
 
   const loadOrders = useCallback(async () => {
-    if (userRole !== UserRole.USER || !auth.currentUser) return;
+    // FIX 2: Changed UserRole.USER to the string literal 'USER'
+    if (userRole !== 'USER' || !auth.currentUser) return;
 
     try {
       const response = await api.get('/user/orders');
@@ -93,7 +96,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((user) => {
-      if (user && userRole === UserRole.USER) {
+      // FIX 3: Changed UserRole.USER to the string literal 'USER'
+      if (user && userRole === 'USER') {
         loadOrders();
       } else {
         setOrders([]);
