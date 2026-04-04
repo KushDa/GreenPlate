@@ -1,11 +1,9 @@
-
 import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { UserRole } from './types';
-import Splash from './Pages/Splash';
-import Auth from './Pages/Auth';
-import UserLayout from './Layouts/UserLayout';
-import StaffLayout from './Layouts/StaffLayout';
+import { AppProvider, useApp } from '../context/AppContext';
+import Splash from '../Pages/Splash';
+import Auth from '../Pages/Auth';
+import UserLayout from '../Layouts/UserLayout';
+import StaffLayout from '../Layouts/StaffLayout';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const SmoothBackground: React.FC = () => (
@@ -45,7 +43,8 @@ const NavigationHandler: React.FC = () => {
         <motion.div key="verify" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.02 }} className="h-full">
           <Auth verifyOnly />
         </motion.div>
-      ) : userRole === UserRole.USER ? (
+      // FIX: Changed from UserRole.USER to strictly the string 'USER'
+      ) : userRole === 'USER' ? (
         <motion.div key="user" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
           <UserLayout />
         </motion.div>

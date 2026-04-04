@@ -1,4 +1,4 @@
-import { FoodDeal, Cafeteria } from './types';
+import type { FoodDeal, Cafeteria } from './types';
 
 export const PRIMARY_GREEN = '#4CAF50';
 export const ACCENT_ORANGE = '#FF6F00';

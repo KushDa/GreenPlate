@@ -1,11 +1,7 @@
-import { createPaymentOrder } from './api';
+import { createPaymentOrder} from './api';
+import type { CartItem } from './api';
 
-interface CartItem {
-  item_id: string;
-  quantity: number;
-}
-
-// ✅ 1. Define a strict interface for the result
+// ── Types ─────────────────────────────────────────────────────────────────────
 export interface PaymentResult {
   success: boolean;
   paymentId?: string;
@@ -15,62 +11,66 @@ export interface PaymentResult {
   error?: string;
 }
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
+interface RazorpayOrderData {
+  id: string;
+  amount: number;
+  currency: string;
+  internal_order_id: string;
+  notes?: { type?: string };
 }
 
-const loadRazorpaySDK = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (window.Razorpay) {
-      resolve();
-      return;
-    }
+interface RazorpaySuccessResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
 
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  prefill: { email: string; name: string };
+  theme: { color: string };
+  handler: (response: RazorpaySuccessResponse) => void;
+  modal: { ondismiss: () => void };
+}
+
+
+// ── SDK Loader ────────────────────────────────────────────────────────────────
+const loadRazorpaySDK = (): Promise<void> =>
+  new Promise((resolve, reject) => {
+    if (window.Razorpay) { resolve(); return; }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
-
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load Razorpay SDK'));
-
     document.body.appendChild(script);
   });
-};
 
-/**
- * Shared helper to open the Razorpay Modal.
- */
+// ── Core Razorpay Opener ──────────────────────────────────────────────────────
 const openRazorpay = async (
-  orderData: any,
+  orderData: RazorpayOrderData,
   userEmail: string,
-  userName: string
-): Promise<PaymentResult> => { // ✅ 2. Use the interface here
+  userName: string,
+): Promise<PaymentResult> => {
   try {
     await loadRazorpaySDK();
 
     return await new Promise((resolve) => {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      const options: RazorpayOptions = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID as string,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'GreenPlate',
         description: orderData.notes?.type === 'RESALE' ? 'Resale Item Payment' : 'Food Order Payment',
-        order_id: orderData.id, 
-
-        prefill: {
-          email: userEmail,
-          name: userName,
-        },
-
-        theme: {
-          color: '#10B981',
-        },
-
-        handler: (response: any) => {
-          console.log('✅ Razorpay success:', response);
-
+        order_id: orderData.id,
+        prefill: { email: userEmail, name: userName },
+        theme: { color: '#10B981' },
+        handler: (response: RazorpaySuccessResponse) => {
           resolve({
             success: true,
             paymentId: response.razorpay_payment_id,
@@ -79,69 +79,44 @@ const openRazorpay = async (
             internalOrderId: orderData.internal_order_id,
           });
         },
-
         modal: {
-          ondismiss: () => {
-            resolve({
-              success: false,
-              error: 'Payment cancelled by user',
-            });
-          },
+          ondismiss: () => resolve({ success: false, error: 'Payment cancelled by user' }),
         },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      new window.Razorpay(options).open();
     });
-  } catch (error: any) {
-    console.error('❌ Razorpay Error:', error);
-    return {
-      success: false,
-      error: error?.message || 'Failed to open payment gateway',
-    };
+  } catch (err) {
+    console.error('❌ Razorpay Error:', err);
+    return { success: false, error: (err as Error).message || 'Failed to open payment gateway' };
   }
 };
 
-/**
- * 1. REGULAR CHECKOUT
- */
+// ── Public API ────────────────────────────────────────────────────────────────
 export const initiatePayment = async (
   cartItems: CartItem[],
   stallId: string,
   userEmail: string,
-  userName: string
-): Promise<PaymentResult> => { // ✅ 3. Explicit return type
+  userName: string,
+): Promise<PaymentResult> => {
   try {
-    console.log('🔄 Creating payment order...', { stallId, cartItems });
-
     const orderData = await createPaymentOrder(stallId, cartItems);
-    return await openRazorpay(orderData, userEmail, userName);
-
-  } catch (error: any) {
-    console.error('❌ Payment Init Error:', error);
-    return {
-      success: false,
-      error: error?.message || 'Payment initiation failed',
-    };
+    return await openRazorpay(orderData as RazorpayOrderData, userEmail, userName);
+  } catch (err) {
+    console.error('❌ Payment Init Error:', err);
+    return { success: false, error: (err as Error).message || 'Payment initiation failed' };
   }
 };
 
-/**
- * 2. RESALE CHECKOUT
- */
 export const initiateResalePayment = async (
-  resaleConfig: any, 
+  resaleConfig: RazorpayOrderData,
   userEmail: string,
-  userName: string
-): Promise<PaymentResult> => { // ✅ 4. Explicit return type
+  userName: string,
+): Promise<PaymentResult> => {
   try {
-    console.log('🔄 Initiating resale payment...', resaleConfig);
     return await openRazorpay(resaleConfig, userEmail, userName);
-  } catch (error: any) {
-    console.error('❌ Resale Payment Error:', error);
-    return {
-      success: false,
-      error: error?.message || 'Resale payment failed',
-    };
+  } catch (err) {
+    console.error('❌ Resale Payment Error:', err);
+    return { success: false, error: (err as Error).message || 'Resale payment failed' };
   }
 };

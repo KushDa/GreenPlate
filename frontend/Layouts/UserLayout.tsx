@@ -3,7 +3,7 @@ import { Home, Receipt, User as UserIcon } from 'lucide-react';
 import MyOrders from '../Pages/MyOrder';
 import Profile from '../Pages/Profile';
 import { motion} from 'framer-motion'; 
-import GreenPlateLogo from '../assests/GreenPlate.png'; 
+import GreenPlateLogo from '../assets/GreenPlate.png'; 
 
 // 1. Import Auth to get the current user// Optional: if you store user data here too
 import UserHome from '../Pages/Userhome';
