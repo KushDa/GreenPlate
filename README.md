@@ -92,6 +92,8 @@ VITE_FIREBASE_APP_ID=your_firebase_app_id
 VITE_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
 VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 
+
+admin portal = http://localhost:5173
 ```
 
 ## 🤝 Contributing
@@ -101,16 +103,6 @@ VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 3. Make your changes
 4. Run tests and linting
 5. Submit a pull request
-
-## 📄 License
-
-See [LICENSE](./LICENSE) file for details.
-
-## 🆘 Support
-
-Having issues? Check:
-- [DEPENDENCIES.md](./DEPENDENCIES.md) for dependency info
-- Project issues on GitHub
 
 ---
 
