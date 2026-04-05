@@ -1,8 +1,0 @@
-{
-	"appId": "com.greenplate.app",
-	"appName": "GreenPlate",
-	"webDir": "dist",
-	"server": {
-		"androidScheme": "https"
-	}
-}
