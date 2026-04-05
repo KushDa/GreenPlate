@@ -13,8 +13,9 @@ class CartItemSchema(BaseModel):
     quantity: int = Field(..., gt=0)
 
 class CreateOrderSchema(BaseModel):
-    stall_id: str
-    items: List[CartItemSchema]
+  stall_id: str
+  items: List[CartItemSchema]
+  eco_points_to_redeem: int = 0
 
 class OrderItemSchema(BaseModel):
     name: str
