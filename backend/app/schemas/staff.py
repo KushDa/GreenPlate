@@ -55,3 +55,12 @@ class ResaleItemSchema(BaseModel):
 
 class UpdateResalePriceSchema(BaseModel):
     new_price: float
+
+class DonationItemSchema(BaseModel):
+  name: str
+  quantity: int
+
+class CreateDonationSchema(BaseModel):
+  items: List[DonationItemSchema]
+  pickup_deadline: str
+  notes: Optional[str] = None

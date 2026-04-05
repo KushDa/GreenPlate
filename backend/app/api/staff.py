@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from app.schemas.staff import (
     UpdateStaffProfileSchema, MenuSchema, UpdateMenuItemSchema,
-    UpdateOrderStatusSchema, VerifyPickupSchema, UpdateResalePriceSchema
+    UpdateOrderStatusSchema, VerifyPickupSchema, UpdateResalePriceSchema, CreateDonationSchema
 )
 from app.services.staff_services import StaffService
 from app.core.security import get_token
@@ -62,3 +62,17 @@ async def get_staff_resale_items(token: str = Depends(get_token)):
 @router.patch("/resale/{resale_id}/price")
 async def update_resale_price(resale_id: str, body: UpdateResalePriceSchema, token: str = Depends(get_token)):
     return await staff_service.update_resale_price(resale_id, body.new_price, token)
+
+@router.post("/donation/request")
+async def create_donation(
+    payload: CreateDonationSchema,
+    token: str = Depends(get_token)
+):
+    return await staff_service.create_food_donation_request(payload, token)
+
+@router.post("/resale/{resale_id}/donate")
+async def donate_resale_item(
+    resale_id: str,
+    token: str = Depends(get_token)
+):
+    return await staff_service.convert_resale_to_donation(resale_id, token)

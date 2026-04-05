@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, ChevronRight, Sparkles, TrendingDown, Zap } from 'lucide-react';
-// Make sure this path matches your folder name (assests vs assets)
-import logoPng from './assests/GreenPlate.png'; 
+import logoPng from '../assets/GreenPlate.png'; 
 
 const Splash: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   const [stage, setStage] = useState<'branding' | 'ecosystem'>('branding');
@@ -38,17 +37,17 @@ const Splash: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
               className="w-44 h-44 flex items-center justify-center mb-6 relative"
             >
               {/* Gentle Floating Animation (Optional - keep for polish) */}
-              <motion.img 
-                src={logoPng} 
-                alt="GreenPlate Logo" 
-                className="w-full h-full object-contain drop-shadow-2xl"
+              <motion.div 
+                className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center drop-shadow-2xl"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ 
                   duration: 4, 
                   repeat: Infinity, 
                   ease: "easeInOut" 
                 }}
-              />
+              >
+                <span className="text-white text-3xl font-bold">GP</span>
+              </motion.div>
             </motion.div>
 
             {/* App Name - Synced with Logo */}

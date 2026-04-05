@@ -16,6 +16,10 @@ async def update_profile(profile_data: UpdateUserProfileSchema, token: str = Dep
 async def get_student_menu(token: str = Depends(get_token)):
     return await user_service.get_user_menu(token)
 
+@router.get("/eco-points")
+async def eco_points(token: str = Depends(get_token)):
+    return await user_service.get_eco_points(token)
+
 @router.get("/feed/discounted")
 async def get_discounted_feed(token: str = Depends(get_token)):
     return await user_service.get_discounted_feed(token)
