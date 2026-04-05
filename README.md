@@ -1,118 +1,221 @@
-
 # 🌱 GreenPlate
 
-**Sustainable Food Waste Reduction Platform**
+**A Full-Stack Sustainable Food Waste Reduction Platform**
 
-A React-based mobile application that connects students and staff with surplus cafeteria food, reducing waste and promoting sustainability.
+GreenPlate is a full-stack web application designed to minimize food waste by connecting users with surplus food from cafeterias. It enables users to discover, reserve, and manage discounted food deals while providing staff with tools to efficiently handle surplus inventory.
 
-## ✨ Features
+---
 
-- 🍽️ Browse available surplus food deals from campus cafeterias
-- 🎯 Reserve meals at discounted prices
-- 📍 Interactive cafeteria map view
-- 👨‍🍳 Staff interface for posting food deals
-- 🤖 AI-powered food analysis using Google Gemini
-- 📊 Track carbon footprint savings
-- 🎨 Beautiful animations with Framer Motion
-- 📱 Mobile-first responsive design
+## 🧠 Architecture Overview
 
-## 🚀 Quick Start
+GreenPlate follows a modular full-stack architecture:
 
-```bash
-# Install dependencies
-npm install
+* **Frontend:** React + Vite + TypeScript
+* **Backend:** Python-based API server
+* **Database & Authentication:** Firebase
+* **Containerization:** Docker support
 
-# Start development server
-npm run dev
+---
 
-# App will open automatically at http://localhost:5000
-```
+## ✨ Core Features
 
-## 🛠️ Tech Stack
+### 👤 User Side
 
-- **React 18** - UI framework with concurrent features
-- **TypeScript** - Type-safe development
-- **Vite** - Lightning-fast build tool
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Smooth animations
-- **Lucide React** - Beautiful icons
-- **Google Generative AI** - AI-powered food analysis
-- **Firebase** - Authentication and database
-- **Axios** - HTTP client for API requests
+* Browse available surplus food deals
+* Reserve meals at discounted prices
+* View order history and status
+
+### 👨‍🍳 Staff Side
+
+* Create and manage food listings
+* Track incoming reservations
+* Manage food distribution workflow
+
+### ⚙️ System Features
+
+* REST API communication between frontend and backend
+* Firebase integration for authentication and storage
+* Responsive UI optimized for mobile devices
+
+> ⚠️ Note: Some advanced features (AI analysis, map view, carbon tracking) may be incomplete or under development.
+
+---
 
 ## 📂 Project Structure
 
 ```
-frontend/
-├── Pages/              # Page components
-│   ├── Auth.tsx        # User authentication & login
-│   ├── UserHome.tsx    # User dashboard & food deals
-│   ├── StaffDashboard.tsx # Staff interface
-│   ├── CreatePost.tsx  # Create new food deal post
-│   ├── DealDetails.tsx # View deal information
-│   ├── MyOrder.tsx     # User's reservations
-│   ├── IncomingReservations.tsx # Staff incoming orders
-│   ├── MapView.tsx     # Cafeteria location map
-│   ├── QueueManager.tsx # Queue management
-│   ├── Profile.tsx     # User profile
-│   ├── Onboarding.tsx  # App onboarding flow
-│   └── Splash.tsx      # Splash screen
-├── Layouts/            # Layout wrappers
-│   ├── UserLayout.tsx  # User layout
-│   ├── StaffLayout.tsx # Staff layout
-│   └── StudentLayout.tsx # Student layout
-├── context/            # React context (state)
-│   └── AppContext.tsx  # Global app state
+GreenPlate/
+├── backend/                 # Python backend
+│   ├── app/                 # Core backend logic
+│   ├── main.py              # Entry point
+│   ├── requirements.txt     # Python dependencies
+│   └── README.md
+│
+├── frontend/                # User-facing React app
+│   ├── Pages/               # Page components
+│   ├── Layouts/             # Layout wrappers
+│   ├── context/             # Global state management
+│   ├── assets/              # Static assets
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── admin-dashboard/         # Admin/staff interface
+│
+├── Dockerfile               # Docker configuration
+├── compose.yaml             # Multi-container setup
+└── README.md
 ```
 
-## 🎯 Available Scripts
+---
+
+## ⚙️ Setup & Installation
+
+### 🔹 Prerequisites
+
+* Node.js (v18+ recommended)
+* Python (v3.8+)
+* npm or yarn
+* Git
+
+---
+
+## 🚀 Running the Project Locally
+
+### 1️⃣ Clone the Repository
 
 ```bash
-npm run dev         # Start development server
-npm run build       # Build for production
-npm run preview     # Preview production build
-npm run lint        # Run ESLint
-npm run type-check  # Check TypeScript types
+git clone https://github.com/your-username/GreenPlate.git
+cd GreenPlate
 ```
 
-## 🌐 Environment Variables
+---
 
-Create a `.env` file in the root directory:
+### 2️⃣ Backend Setup
+
+```bash
+cd backend
+pip install -r requirements.txt
+python main.py
+```
+
+👉 Backend will run at:
+
+```
+http://localhost:8000
+```
+
+---
+
+### 3️⃣ Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+👉 Frontend will run at:
+
+```
+http://localhost:5173
+```
+
+---
+
+### 4️⃣ Admin Dashboard (Optional)
+
+```bash
+cd admin-dashboard
+npm install
+npm run dev
+```
+
+---
+
+## 🌐 Environment Configuration
+
+Create a `.env` file inside the **frontend** directory:
 
 ```env
-VITE_API_KEY=your_google_gemini_api_key
 VITE_API_URL=http://localhost:8000
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-VITE_FIREBASE_DATABASE_URL=your_firebase_database_url
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_firebase_app_id
-VITE_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
-VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
+
+> ⚠️ Never commit `.env` files to version control.
+
+---
+
+## 🐳 Docker Setup (Optional)
+
+Run the entire project using Docker:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## 📜 Available Scripts (Frontend)
+
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run preview    # Preview production build
+npm run lint       # Run ESLint
+npm run type-check # TypeScript validation
+```
+
+---
+
+## ⚠️ Known Issues
+
+* Some static assets (e.g., `react.svg`, `vite.svg`) may be missing
+* Firebase setup is required manually
+* Backend API endpoints may require additional configuration
+* Certain features may be incomplete
+
+---
+
+## 🔒 Security Notes
+
+* Do not expose API keys publicly
+* Use environment variables for all sensitive configurations
+* Validate all user inputs on backend
+
+---
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
 
-## 📄 License
-
-See [LICENSE](./LICENSE) file for details.
-
-## 🆘 Support
-
-Having issues? Check:
-- [DEPENDENCIES.md](./DEPENDENCIES.md) for dependency info
-- Project issues on GitHub
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. Commit changes
+4. Push to your fork
+5. Open a Pull Request
 
 ---
 
-**Built with 💚 for a sustainable future**
+## 📄 License
+
+This project is licensed under the terms specified in the LICENSE file.
+
+---
+
+## 🌍 Vision
+
+GreenPlate aims to reduce food waste and promote sustainability by leveraging technology to connect surplus food with people who need it.
+
+---
+
+**Built with 💚 for a more sustainable future**
+
 
